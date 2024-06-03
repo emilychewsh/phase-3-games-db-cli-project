@@ -155,6 +155,5 @@ if __name__ == "__main__":
     # seed_games()
 
 
-    # print("Seeding complete!")
+    print("Seeding complete!")
 
-    
