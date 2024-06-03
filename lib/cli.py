@@ -53,6 +53,17 @@ def main_menu():
 
 
 ##################################################### Functions for choices 
+def save_to_favourites(game): #Save game to favourites, but also checks it is already in list
+    existing_favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game.id).first()
+    if existing_favourite:
+        print(f"'{game.title}' is already in your favaourites.")
+    else:
+        favourite = Favourite(user_id=logged_user.id, game_id=game.id)
+        session.add(favourite)
+        session.commit()
+        print(f"You have successfully saved the game '{game.title}' to your favourite list!")
+
+
 def view_all_games(games):
     if len(games)>0:
         for game in games:
@@ -87,6 +98,17 @@ def view_all_games(games):
                 print(f"Rating: {game.rating}")
                 print(f"Platform: {game.platform}")
                 print(f"Trailer: {game.trailer}")
+
+                #Ask to see if user wants to save game to favourites
+                print("Would you like add this game to your favourite list? (yes/no)")
+                save_input = input().lower()
+                if save_input == "yes":
+                    save_to_favourites(game)
+                elif save_input == "no":
+                    return
+                else:
+                    print("Please enter a valid input: 'yes/no")
+
             else:
                 print("No game found! Try again.")
         
