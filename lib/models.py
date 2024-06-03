@@ -33,7 +33,7 @@ class Game(Base):
     users = association_proxy("favourites", "user", creator= lambda u: Favourite(user=u))
 
     def __repr__(self):
-        return f"{self.id} - {self.title} ({self.genre} : {self.description})"
+        return f"{self.id} - {self.title} | {self.genre}"
 
 class Favourite(Base):
     __tablename__ = "favourites"
