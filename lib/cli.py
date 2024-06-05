@@ -91,9 +91,54 @@ def view_game_details(game):
 def view_by_genre():
     genres = ["RPG", "Action", "Anime", "Battle", "Racing"]
 
-    print("Genres:")
+    print("Genres:") #Display the genre in a numbered list
     for idx, genre in enumerate(genres, 1):
         print(f"{idx}. {genre}")
+    
+    genre_choice = input("\nEnter the genre number you want to view(or type 'back' to return): ")
+    if genre_choice.lower() == "back":
+        clear()
+        return
+
+    #Validate and process genre selection
+    try:
+        genre_idx = int(genre_choice) - 1
+        if 0<= genre_idx < len(genres):
+            selected_genre = genres[genre_idx]
+            games = session.query(Game).filter_by(genre=selected_genre).all()
+
+            #Display games in selected genre
+            if games:
+                for game in games:
+                    print(f"{game.id}) {game.title} - {game.genre}")
+
+                print("-"*30)
+                print("\nPlease enter the game ID to view more details (type 'back' to return): ")
+                id_input = input()
+                if id_input == "back":
+                    clear()
+                    return
+                else:
+                    try:
+                        game_id = int(id_input)
+                        game = session.query(Game).filter_by(id=game_id, genre=selected_genre).first()
+
+                        #Display game detals or handle invalid input
+                        if game:
+                            view_game_details(game)
+                        else:
+                            print("No game found with that ID in the selected genre.")
+                    except ValueError:
+                        print("Invalid input.Please enter valid game ID or 'back' to return to previous selection")
+            
+            else:
+                print("No games found in this genre.")
+        else:
+            print("Invalid genre selection.")
+    except ValueError:
+        print("Invalid input. Please enter a valid genre number or 'back' to return.")
+
+                    
 
 def view_all_games():
     while True:
@@ -105,6 +150,7 @@ def view_all_games():
         choice = input("Enter your choice: ").lower()
 
         if choice == "1":
+            clear()
             games = session.query(Game).all()
             if len(games)>0:
                 for game in games:
