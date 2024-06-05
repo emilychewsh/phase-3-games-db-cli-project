@@ -199,6 +199,20 @@ def add_note_to_favourite(game_id):
         else:
             print("Favourite game not found")
 
+
+def view_notes():
+    favourites = session.query(Favourite).filter_by(user_id =logged_user.id).all()
+    if len(favourites) > 0 :
+        for fav in favourites:
+            note = fav.note if fav.note else "No notes added."
+            print(f"{fav.game.title}: {note}")
+    else:
+        print("You have no notes added to any of your favourite games yet.")
+    
+    choice = input("\nWould you like to delete any of these notes? (yes/no): ")
+    if choice == "yes":
+        # delete_note()
+
 def view_favourites():
     while True:
         favourites = session.query(Favourite).filter_by(user_id=logged_user.id).all()
@@ -213,7 +227,8 @@ def view_favourites():
         print("\nPlease choose from the following options:")
         print("1) View details of a favourite game")
         print("2) View all games in general")
-        print("3) Return to main menu")
+        print("3) View all notes")
+        print("4) Return to main menu")
 
         choice = input().lower()
 
@@ -255,6 +270,9 @@ def view_favourites():
             view_all_games()
 
         elif choice == "3":
+            clear()
+            view_notes()
+        elif choice == "4":
             clear()
             break
         else:
