@@ -13,6 +13,7 @@ def clear(): #Clearing terminal
 
 
 def login(username): #Check if user exists
+    global logged_user
     user = session.query(User).filter(User.name == username).first()
 
     if not user:
@@ -26,7 +27,6 @@ def login(username): #Check if user exists
         clear()
         print(f"Welcome back, {user.name}")
 
-    global logged_user
     logged_user = user
 
 
@@ -64,58 +64,84 @@ def save_to_favourites(game): #Save game to favourites, but also checks it is al
         session.commit()
         print(f"You have successfully saved the game '{game.title}' to your favourite list!")
 
+def view_game_details(game):
+    clear()
+    print(f"{game.title.upper()}")
+    print(f"GENRE: {game.genre}")
+    print(f"DESCRIPTION: {game.description}")
 
-def view_all_games():
-    games = session.query(Game).all()
-    if len(games)>0:
-        for game in games:
-            print(game)
-    else:
-        print("No games...")
-    
-    print('-'*30)
-    print("\nPlease enter the game ID to view more details (type 'back' to go back):")
+    print("Other Details")
+    print(f"Rating: {game.rating}")
+    print(f"Platform: {game.platform}")
+    print(f"Trailer: {game.trailer}")
 
-    id_input = input()
-
-    if id_input == "back":
+    #Ask to see if user wants to save game to favourites
+    print("Would you like add this game to your favourite list? (yes/no)")
+    save_input = input().lower()
+    if save_input == "yes":
+        clear()
+        save_to_favourites(game)
+    elif save_input == "no":
         clear()
         return
     else:
-        try:
-            game_id = int(id_input)
-            game = [ g for g in games if g.id == game_id ]
+        print("Please enter a valid input: 'yes/no")
 
-            if len(game)>0:
-                game = game[0]
-                
-                clear()
 
-                #Print and display game info for selected ID
-                print(f"{game.title.upper()}")
-                print(f"GENRE: {game.genre}")
-                print(f"DESCRIPTION: {game.description}")
+def view_by_genre():
+    genres = ["RPG", "Action", "Anime", "Battle", "Racing"]
 
-                print("Other Details")
-                print(f"Rating: {game.rating}")
-                print(f"Platform: {game.platform}")
-                print(f"Trailer: {game.trailer}")
+    print("Genres:")
+    for idx, genre in enumerate(genres, 1):
+        print(f"{idx}. {genre}")
 
-                #Ask to see if user wants to save game to favourites
-                print("Would you like add this game to your favourite list? (yes/no)")
-                save_input = input().lower()
-                if save_input == "yes":
-                    save_to_favourites(game)
-                elif save_input == "no":
-                    return
-                else:
-                    print("Please enter a valid input: 'yes/no")
+def view_all_games():
+    while True:
+        print("\nHow would you like to view the games?")
+        print("1) View games in general")
+        print("2) View games by genre")
+        print("3) Return to main menu")
+    
+        choice = input("Enter your choice: ").lower()
 
+        if choice == "1":
+            games = session.query(Game).all()
+            if len(games)>0:
+                for game in games:
+                    print(game)
             else:
-                print("No game found! Try again.")
-        
-        except ValueError:
-            print("Invalid input. Please enter a valid game ID or 'back' to return to previous selection.")
+                print("No games...")
+            
+            print('-'*30)
+
+            #Entering Game ID to view more details about a game
+            print("\nPlease enter the game ID to view more details (type 'back' to go back):")
+            id_input = input()
+            if id_input == "back":
+                clear()
+                return
+            else:
+                try:
+                    game_id = int(id_input)
+                    game = session.query(Game).filter_by(id=game_id).first()
+
+                    if game:
+                        view_game_details(game)
+                    else:
+                        print("No game found! Try again.")
+                
+                except ValueError:
+                    print("Invalid input. Please enter a valid game ID or 'back' to return to previous selection.")
+
+        elif choice == "2":
+            clear()
+            view_by_genre()
+        elif choice == "3":
+            clear()
+            break
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
            
 def add_note_to_favourite(game_id):
         favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
