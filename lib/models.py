@@ -42,6 +42,7 @@ class Favourite(Base):
 
     user_id = Column(Integer(), ForeignKey("users.id"))
     game_id = Column(Integer(), ForeignKey("games.id"))
+    note = Column(String())
 
     user = relationship("User", back_populates="favourites")
     game = relationship("Game", back_populates="favourites")
