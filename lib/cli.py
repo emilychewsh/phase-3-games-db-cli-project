@@ -40,7 +40,7 @@ def greet(): #Greet
 
 def main_menu():
     print(f"-"*30)
-    print("By Emily Chew | e: emilychewsh@gmail.com")
+    print("By Emily Chew")
     print(f"-"*30)
 
     print("Please select where you want to go...")
@@ -117,51 +117,76 @@ def view_all_games():
         except ValueError:
             print("Invalid input. Please enter a valid game ID or 'back' to return to previous selection.")
            
-
+def add_note_to_favourite(game_id):
+        favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
+        if favourite:
+            note = input("Enter your note:")
+            favourite.note = note
+            session.commit()
+            print(f"Your note is successfully added to '{favourite.game.title}'!")
+        else:
+            print("Favourite game not found")
 
 def view_favourites():
-    favourites = session.query(Favourite).filter_by(user_id=logged_user.id).all()
-    if len(favourites)>0:
-        for fav in favourites:
-            game = fav.game
-            print(f"{game.id}) {game.title} - {game.genre}")
-    else:
-        print("You have no favourite games yet.")
+    while True:
+        favourites = session.query(Favourite).filter_by(user_id=logged_user.id).all()
+        if len(favourites)>0:
+            for fav in favourites:
+                game = fav.game
+                note = fav.note if fav.note else "No notes added."
+                print(f"{game.id}) {game.title} - {game.genre}")
+        else:
+            print("You have no favourite games yet.")
 
-    print("\nPlease choose from the following options:")
-    print("1) View details of a favourite game")
-    print("2) View all games in general")
-    print("3) Return to main menu")
+        print("\nPlease choose from the following options:")
+        print("1) View details of a favourite game")
+        print("2) View all games in general")
+        print("3) Return to main menu")
 
-    choice = input().lower()
+        choice = input().lower()
 
-    if choice == "1":
-        try:
-            game_id = input("Enter Game ID:")
-            game = session.query(Game).filter_by(id=game_id).first()
-            if game:
-                clear()
-                print(f"{game.title.upper()}")
-                print(f"GENRE: {game.genre}")
-                print(f"DESCRIPTION: {game.description}")
+        if choice == "1":
+            try:
+                game_id = int(input("Enter Game ID:"))
+                favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
+                if favourite:
+                    game = favourite.game
+                    clear()
+                    print(f"{game.title.upper()}")
+                    print(f"GENRE: {game.genre}")
+                    print(f"DESCRIPTION: {game.description}")
 
-                print("Other Details")
-                print(f"Rating: {game.rating}")
-                print(f"Platform: {game.platform}")
-                print(f"Trailer: {game.trailer}")
-            else:
-                print("No game found with that ID")
-        except ValueError:
-            print("Invalid input. Please enter a valid game ID.")
+                    print("Other Details")
+                    print(f"Rating: {game.rating}")
+                    print(f"Platform: {game.platform}")
+                    print(f"Trailer: {game.trailer}")
 
-    elif choice == "2":
-        clear()
-        view_all_games()
+                    print("-"*30)
+                    print("MY OWN NOTES")
+                    print("-"*30)
+                    print(f"{favourite.note if favourite.note else 'No notes added yet.'}")
+                    
+                    #Ask user if they want to add a note to this game 
+                    subchoice = input("Do you want to add a note to this game? (yes/no):").lower()
+                    if subchoice == "yes":
+                        add_note_to_favourite(game_id)
+                    elif subchoice == "no":
+                        continue
 
-    elif choice == "3":
-        clear()
-    else:
-        print("Invalid choice. Please enter 1, 2 or 3.")
+                else:
+                    print("No game found with that ID")
+            except ValueError:
+                print("Invalid input. Please enter a valid game ID.")
+
+        elif choice == "2":
+            clear()
+            view_all_games()
+
+        elif choice == "3":
+            clear()
+            break
+        else:
+            print("Invalid choice. Please enter 1, 2 or 3.")
 
 
 
