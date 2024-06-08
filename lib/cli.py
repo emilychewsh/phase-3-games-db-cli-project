@@ -2,6 +2,7 @@ from config import session
 from models import User, Game, Favourite
 from colorama import Back, Fore, Style
 import pyfiglet 
+from tabulate import tabulate
 import os
 
 logged_user = None
@@ -27,7 +28,7 @@ def login(username): #Check if user exists
 
     else:
         clear()
-        print(f"Welcome back, {Fore.GREEN}{user.name} {Style.RESET_ALL}!")
+        print(f"Welcome back, {Fore.LIGHTGREEN_EX}{user.name} {Style.RESET_ALL}!")
 
     logged_user = user
 
@@ -35,7 +36,7 @@ def login(username): #Check if user exists
 def greet(): #Greet
     clear()
     styled_title = pyfiglet.figlet_format("WELCOME TO CRUX GAMES LOOKUP!", font="small")
-    print(Fore.GREEN + styled_title + Style.RESET_ALL)
+    print(Fore.LIGHTGREEN_EX + styled_title + Style.RESET_ALL)
     print("Welcome to Crux games database where you can look up your favourite games!")
     print("Please enter your username to log in or sign up by entering a username:")
     
@@ -45,13 +46,13 @@ def greet(): #Greet
 
 def main_menu():
     print(f"-"*30)
-    print("By Emily Chew")
+    print(Fore.LIGHTBLUE_EX + "By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
     print(f"-"*30)
 
-    print("Please select where you want to go...")
-    print("1. " + "View all games")
-    print("2. " + "View your saved favourites")
-    print("3. " + "Exit this app")
+    print("Please select where you want to go...\n")
+    print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tView all games")
+    print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView your saved favourites")
+    print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tExit this app")
 
     choice = input()
     return choice #Return user's choice
@@ -158,8 +159,12 @@ def view_all_games():
             clear()
             games = session.query(Game).all()
             if len(games)>0:
+                table = []
                 for game in games:
-                    print(game)
+                    table.append([game.id, game.title, game.genre, game.rating])
+                
+                headers = [Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, Fore.LIGHTRED_EX + "Rating" + Fore.RESET]
+                print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
             else:
                 print("No games...")
             

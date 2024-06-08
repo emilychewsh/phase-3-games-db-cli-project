@@ -8,6 +8,7 @@ sqlalchemy = "*"
 alembic = "*"
 colorama = "*"
 pyfiglet = "*"
+tabulate = "*"
 
 [dev-packages]
 
