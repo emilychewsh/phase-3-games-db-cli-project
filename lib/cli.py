@@ -1,6 +1,7 @@
 from config import session
 from models import User, Game, Favourite
 from colorama import Back, Fore, Style
+import pyfiglet 
 import os
 
 logged_user = None
@@ -17,6 +18,7 @@ def login(username): #Check if user exists
     user = session.query(User).filter(User.name == username).first()
 
     if not user:
+        clear()
         user = User(name=username)
         session.add(user)
         session.commit()
@@ -25,12 +27,15 @@ def login(username): #Check if user exists
 
     else:
         clear()
-        print(f"Welcome back, {user.name}")
+        print(f"Welcome back, {Fore.GREEN}{user.name} {Style.RESET_ALL}!")
 
     logged_user = user
 
 
 def greet(): #Greet
+    clear()
+    styled_title = pyfiglet.figlet_format("WELCOME TO CRUX GAMES LOOKUP!", font="small")
+    print(Fore.GREEN + styled_title + Style.RESET_ALL)
     print("Welcome to Crux games database where you can look up your favourite games!")
     print("Please enter your username to log in or sign up by entering a username:")
     
@@ -209,27 +214,36 @@ def delete_note_from_favourite(game_id):
 
     
 def view_notes():
-    favourites = session.query(Favourite).filter_by(user_id =logged_user.id).all()
-    if len(favourites) > 0 :
-        for fav in favourites:
-            note = fav.note if fav.note else "No notes added."
-            print(f"{fav.game_id}) {fav.game.title}: {note}")
-    
-        #Ask user if they want to delete any note
-        choice = input("\nWould you like to delete any of these notes? (yes/no): ").lower()
-        if choice == "yes":
+    while True:
+        favourites_with_notes = session.query(Favourite).filter(Favourite.user_id == logged_user.id, Favourite.note.isnot(None)).all()
+        if favourites_with_notes:
+            print("Your Notes:")
+            for fav in favourites_with_notes:
+                print(f"Game ID: {fav.game_id} | Game Title: {fav.game.title} | Note: {fav.note}")
+        else:
+            print("You have no notes for any of your favourite games.")
+        
+        print("\nPlease choose from the following options:")
+        print("1) Delete a note")
+        print("2) Return to main menu")
+
+        choice = input().lower()
+
+        if choice == "1":
             try:
-                game_id = int(input("Enter the Game ID for the note you want to delete: "))
+                clear()
+                game_id = int(input("Enter Game ID of the note to delete: "))
                 delete_note_from_favourite(game_id)
                 print(f"Successfully deleted note from '{fav.game.title}'!")
             except ValueError:
                 print("Invalid input. Please enter a valid Game ID.")
-        elif choice == "no":
-            return
+        
+        elif choice == "2":
+            clear()
+            break
+        
         else:
-            print("Invalid input. Please enter 'yes' or 'no'. ")
-    else:
-        print("You have no notes added to any of your favourite games yet.")
+            print("Invalid choice. Please enter 1 or 2.")
 
 
 def view_favourites():
@@ -273,7 +287,7 @@ def view_favourites():
                     print(f"{favourite.note if favourite.note else 'No notes added yet.'}")
                     
                     #Ask user if they want to add a note to this game 
-                    subchoice = input("Do you want to add a note to this game? (yes/no):").lower()
+                    subchoice = input("Do you want to add a note to this game? (yes/no): ").lower()
                     if subchoice == "yes":
                         clear()
                         add_note_to_favourite(game_id)
@@ -316,7 +330,7 @@ def start():
             view_favourites()
         elif choice == "3":
             clear()
-            print("Thank you for using Crux Games App, see you again!")
+            print(f"Thank you for using Crux Games App, see you again soon {Fore.GREEN}{logged_user.name}{Style.RESET_ALL}!")
             break
         else:
             print("Please enter a valid selection")
