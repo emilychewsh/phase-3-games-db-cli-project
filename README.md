@@ -19,19 +19,56 @@ git clone https://github.com/emilychewsh/phase-3-games-db-cli-project.git
 cd phase-3-games-db-cli-project
 ```
 
-2. Set up the virtual environment using Pipenv:
+2. Install the dependencies:
 
 ```bash
 pipenv install
 ```
 
-3. Set up a virtual environment.
+3. Set up the virtual environment using Pipenv.
 
 ```bash
 pipenv shell
 ```
 
 4. Happy browsing!
+
+## Usage
+
+Upon running the application, users will be prompted to either log in or sign up. From the main menu, users can choose to view all games, view their favorite list, or exit the app. Users can look up games, add them to their favorites, make notes, and manage their notes all through a user-friendly CLI.
+
+## Database Schema
+
+These are the 3 main tables used with SQLAlchemy to establish many to many relationships:
+
+### User
+
+| Column | Type    | Description          |
+| ------ | ------- | -------------------- |
+| id     | Integer | Primary key          |
+| name   | String  | User names to log in |
+
+### Game
+
+| Column      | Type    | Description        |
+| ----------- | ------- | ------------------ |
+| id          | Integer | Primary key        |
+| title       | String  | Title of game      |
+| genre       | String  | Genre of game      |
+| price       | Integer | Price of game      |
+| description | String  | Storyline of game  |
+| rating      | Intger  | Game rating        |
+| platform    | String  | Platform available |
+| trailer     | String  | Youtube URL        |
+
+### Favaourite
+
+| Column  | Type    | Description             |
+| ------- | ------- | ----------------------- |
+| id      | Integer | Primary key             |
+| note    | String  | Notes of favourite      |
+| user_id | Integer | Foreign Key for `users` |
+| game_id | Integer | Foreign Key for `games` |
 
 ## Credits:
 
