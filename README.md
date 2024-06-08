@@ -3,7 +3,6 @@
 ![GameSage image](lib/assets/gamesage.jpg)
 
 Welcome to my first Python CLI App! <br>
-Currently, two official plugins are available: <br>
 
 This project uses Python, SQLAlchemy, and external libraries such as Tabulate, PyFiglet and Colorama.
 
@@ -24,7 +23,6 @@ cd phase-3-games-db-cli-project
 
 ```bash
 pipenv install
-pipenv shell
 ```
 
 3. Set up a virtual environment.
@@ -39,7 +37,7 @@ pipenv shell
 
 - [Colorama](https://pypi.org/project/colorama/) for colours used.
 - [Tabulate](https://pypi.org/project/tabulate/) for tables used.
-- [PyFiglet](https://pypi.org/project/pyfiglet/) for tables used.
+- [PyFiglet](https://pypi.org/project/pyfiglet/) for title used.
 
 ## License
 
