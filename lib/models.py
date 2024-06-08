@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -43,6 +43,7 @@ class Favourite(Base):
     user_id = Column(Integer(), ForeignKey("users.id"))
     game_id = Column(Integer(), ForeignKey("games.id"))
     note = Column(String())
+    note_date_time = Column(DateTime, nullable=False) 
 
     user = relationship("User", back_populates="favourites")
     game = relationship("Game", back_populates="favourites")
