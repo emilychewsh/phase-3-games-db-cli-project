@@ -10,6 +10,8 @@ This project uses Python, SQLAlchemy, and external libraries such as Tabulate, P
 
 This CLI Games Lookup enables users to log in or sign up - view games, manage favourite games and notes associated with them.
 
+Upon running the application, users will be prompted to either log in or sign up. From the main menu, users can choose to view all games, view their favorite list, or exit the app. Users can look up games, add them to their favorites, make notes, and manage their notes all through a user-friendly CLI.
+
 ## Getting Started
 
 1. Clone the Repository:
@@ -32,10 +34,6 @@ pipenv shell
 ```
 
 4. Happy browsing!
-
-## Usage
-
-Upon running the application, users will be prompted to either log in or sign up. From the main menu, users can choose to view all games, view their favorite list, or exit the app. Users can look up games, add them to their favorites, make notes, and manage their notes all through a user-friendly CLI.
 
 ## Database Schema
 
