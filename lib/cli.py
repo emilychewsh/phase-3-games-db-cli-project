@@ -40,7 +40,8 @@ def greet(): #Greet
     print("Welcome to Crux games database where you can look up your favourite games!")
     print("Please enter your username to log in or sign up by entering a username:")
     
-    username = input()
+    username = input(Fore.LIGHTGREEN_EX)
+    print(Style.RESET_ALL, end="")
     login(username)
 
 
@@ -49,14 +50,14 @@ def main_menu():
     print(Fore.LIGHTBLUE_EX + "By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
     print(f"-"*30)
 
-    print("Please select where you want to go...\n")
-    print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tView all games")
+    print(Fore.LIGHTGREEN_EX + "\n1) " + Style.RESET_ALL + "\tView all games")
     print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView your saved favourites")
     print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tExit this app")
 
-    choice = input()
+    print("\nPlease select where you want to go...")
+    choice = input(Fore.LIGHTGREEN_EX).lower()
+    print(Style.RESET_ALL, end="")
     return choice #Return user's choice
-
 
 ##################################################### Functions for choices 
 
@@ -97,11 +98,11 @@ def view_game_details(game):
 def view_by_genre():
     genres = ["RPG", "Action", "Anime", "Battle", "Racing"]
 
-    print("Genres:") #Display the genre in a numbered list
+    print("\nGenres: \n") #Display the genre in a numbered list
     for idx, genre in enumerate(genres, 1):
-        print(f"{idx}. {genre}")
+        print(f"{idx}) \t{genre}")
     
-    genre_choice = input("\nEnter the genre number you want to view(or type 'back' to return): ")
+    genre_choice = input("\nEnter the genre number you want to view(or type 'back' to return): \n")
     if genre_choice.lower() == "back":
         clear()
         return
@@ -115,12 +116,16 @@ def view_by_genre():
 
             #Display games in selected genre
             if games:
+                table = []
                 for game in games:
-                    print(f"{game.id}) {game.title} - {game.genre}")
+                    table.append([game.id, game.title, game.genre, game.rating])
+                
+                headers = [Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, Fore.LIGHTRED_EX + "Rating" + Fore.RESET]
+                print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
 
-                print("-"*30)
+
                 print("\nPlease enter the game ID to view more details (type 'back' to return): ")
-                id_input = input()
+                id_input = input(Fore.LIGHTGREEN_EX)
                 if id_input == "back":
                     clear()
                     return
@@ -148,12 +153,14 @@ def view_by_genre():
 
 def view_all_games():
     while True:
-        print("\nHow would you like to view the games?")
-        print("1) View games in general")
-        print("2) View games by genre")
-        print("3) Return to main menu")
-    
-        choice = input("Enter your choice: ").lower()
+        print("\nHow would you like to view the games?\n")
+        print("1) \tView games in general")
+        print("2) \tView games by genre")
+        print("3) \tReturn to main menu\n")
+
+        print("Enter your choice: ", end="")
+        choice = input(Fore.LIGHTGREEN_EX + Style.BRIGHT).lower()
+        print(Style.RESET_ALL, end="")
 
         if choice == "1":
             clear()
@@ -168,11 +175,11 @@ def view_all_games():
             else:
                 print("No games...")
             
-            print('-'*30)
 
             #Entering Game ID to view more details about a game
             print("\nPlease enter the game ID to view more details (type 'back' to go back):")
-            id_input = input()
+            id_input = input(Fore.LIGHTGREEN_EX)
+            print(Style.RESET_ALL, end="")
             if id_input == "back":
                 clear()
                 return
