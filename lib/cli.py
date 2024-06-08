@@ -192,26 +192,45 @@ def view_all_games():
 def add_note_to_favourite(game_id):
         favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
         if favourite:
-            note = input("Enter your note:")
+            note = input("Enter your note: ")
             favourite.note = note
             session.commit()
             print(f"Your note is successfully added to '{favourite.game.title}'!")
         else:
             print("Favourite game not found")
 
+def delete_note_from_favourite(game_id):
+    favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
+    if favourite: 
+        favourite.note = None #Clear the note
+        session.commit()
+    else:
+        print("Favourite game not found")
 
+    
 def view_notes():
     favourites = session.query(Favourite).filter_by(user_id =logged_user.id).all()
     if len(favourites) > 0 :
         for fav in favourites:
             note = fav.note if fav.note else "No notes added."
-            print(f"{fav.game.title}: {note}")
+            print(f"{fav.game_id}) {fav.game.title}: {note}")
+    
+        #Ask user if they want to delete any note
+        choice = input("\nWould you like to delete any of these notes? (yes/no): ").lower()
+        if choice == "yes":
+            try:
+                game_id = int(input("Enter the Game ID for the note you want to delete: "))
+                delete_note_from_favourite(game_id)
+                print(f"Successfully deleted note from '{fav.game.title}'!")
+            except ValueError:
+                print("Invalid input. Please enter a valid Game ID.")
+        elif choice == "no":
+            return
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'. ")
     else:
         print("You have no notes added to any of your favourite games yet.")
-    
-    choice = input("\nWould you like to delete any of these notes? (yes/no): ")
-    if choice == "yes":
-        # delete_note()
+
 
 def view_favourites():
     while True:
@@ -256,6 +275,7 @@ def view_favourites():
                     #Ask user if they want to add a note to this game 
                     subchoice = input("Do you want to add a note to this game? (yes/no):").lower()
                     if subchoice == "yes":
+                        clear()
                         add_note_to_favourite(game_id)
                     elif subchoice == "no":
                         continue
