@@ -1,7 +1,6 @@
 from config import session
 from models import User, Game, Favourite
 from colorama import Back, Fore, Style
-from datetime import datetime
 import pyfiglet 
 from tabulate import tabulate
 import os
@@ -25,7 +24,7 @@ def login(username): #Check if user exists
         session.add(user)
         session.commit()
 
-        print(f"Hi {user.name}, you have successfully been registered into the Crux Games App!")
+        print("Hi " + Fore.LIGHTGREEN_EX + user.name + Style.RESET_ALL + ", you have successfully been registered into the GameSage App!")
 
     else:
         clear()
@@ -36,9 +35,9 @@ def login(username): #Check if user exists
 
 def greet(): #Greet
     clear()
-    styled_title = pyfiglet.figlet_format("WELCOME TO CRUX GAMES LOOKUP!", font="small")
+    styled_title = pyfiglet.figlet_format("WELCOME TO THE GAMESAGE APP!", font="small")
     print(Fore.LIGHTGREEN_EX + styled_title + Style.RESET_ALL)
-    print("\nWelcome to Crux games database where you can look up your favourite games!")
+    print("\nWelcome to GameSage where you can look up your favourite games!")
     print("\nPlease enter your username to log in or sign up by entering a username: ")
     
     username = input(Fore.LIGHTGREEN_EX)
@@ -48,10 +47,10 @@ def greet(): #Greet
 
 def main_menu():
     print(f"-"*65)
-    print(Fore.LIGHTBLUE_EX + "Crux Games Lookup By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
+    print(Fore.LIGHTBLUE_EX + "GameSage App By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
     print(f"-"*65)
 
-    print(Fore.LIGHTGREEN_EX + "\n1) " + Style.RESET_ALL + "\tView all games")
+    print(Fore.LIGHTGREEN_EX + "\n1) " + Style.RESET_ALL + "\tGames Lookup")
     print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView your saved favourites")
     print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tExit this app")
 
@@ -97,7 +96,9 @@ def view_game_details(game, from_favourites=False):
     print_heading(Back.LIGHTGREEN_EX + centered_title + Style.RESET_ALL)
 
     print("\nGenre: " + Fore.LIGHTGREEN_EX + game.genre + Style.RESET_ALL)
+    print("\nPrice: " + Fore.LIGHTGREEN_EX +  "$" + str(game.price) + " AUD" + Style.RESET_ALL)
     print("\nRating: " + Fore.LIGHTGREEN_EX + str(game.rating) + Style.RESET_ALL + "\n")
+
           
     print_heading("Description")
     print(Fore.LIGHTGREEN_EX + game.description + Style.RESET_ALL + "\n")
@@ -111,7 +112,7 @@ def view_game_details(game, from_favourites=False):
 
     if not from_favourites:
         #Ask to see if user wants to save game to favourites
-        print("\nWould you like add this game to your favourite list? (yes/no)")
+        print("\nWould you like to add this game to your favourite list? (yes/no)")
         save_input = input(Fore.LIGHTGREEN_EX).lower()
         print(Style.RESET_ALL, end="")
         if save_input == "yes":
@@ -138,6 +139,8 @@ def view_game_details(game, from_favourites=False):
         elif subchoice == "no":
             clear()
             return
+        else:
+            print(Fore.LIGHTRED_EX + "\nPlease enter a valid choice. Returning to favourite list...\n" + Style.RESET_ALL)
 
 
 def view_by_genre():
@@ -295,7 +298,7 @@ def view_notes():
                 Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, 
                 Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, 
                 Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, 
-                Fore.LIGHTRED_EX + "Note" + Fore.RESET
+                Fore.LIGHTRED_EX + "Note" + Fore.RESET,
                 ]
             print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
         else:
@@ -413,7 +416,7 @@ def start():
             view_favourites()
         elif choice == "3":
             clear()
-            print(f"Thank you for using Crux Games App, see you again soon {Fore.GREEN}{logged_user.name}{Style.RESET_ALL}!")
+            print(f"Thank you for using the GameSage App, see you again soon {Fore.GREEN}{logged_user.name}{Style.RESET_ALL}!")
             break
         else:
             print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2, or 3." + Style.RESET_ALL)
