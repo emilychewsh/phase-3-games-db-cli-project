@@ -28,7 +28,7 @@ def login(username): #Check if user exists
 
     else:
         clear()
-        print(f"Welcome back, {Fore.LIGHTGREEN_EX}{user.name} {Style.RESET_ALL}!")
+        print(f"Welcome back,{Fore.LIGHTGREEN_EX} {user.name} {Style.RESET_ALL}!")
 
     logged_user = user
 
@@ -37,8 +37,8 @@ def greet(): #Greet
     clear()
     styled_title = pyfiglet.figlet_format("WELCOME TO CRUX GAMES LOOKUP!", font="small")
     print(Fore.LIGHTGREEN_EX + styled_title + Style.RESET_ALL)
-    print("Welcome to Crux games database where you can look up your favourite games!")
-    print("Please enter your username to log in or sign up by entering a username:")
+    print("\nWelcome to Crux games database where you can look up your favourite games!")
+    print("\nPlease enter your username to log in or sign up by entering a username: ")
     
     username = input(Fore.LIGHTGREEN_EX)
     print(Style.RESET_ALL, end="")
@@ -47,7 +47,7 @@ def greet(): #Greet
 
 def main_menu():
     print(f"-"*30)
-    print(Fore.LIGHTBLUE_EX + "By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
+    print(Fore.LIGHTBLUE_EX + "Crux Games Lookup By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
     print(f"-"*30)
 
     print(Fore.LIGHTGREEN_EX + "\n1) " + Style.RESET_ALL + "\tView all games")
@@ -64,27 +64,36 @@ def main_menu():
 def save_to_favourites(game): #Save game to favourites, but also checks it is already in list
     existing_favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game.id).first()
     if existing_favourite:
-        print(f"'{game.title}' is already in your favourites.")
+        print(Fore.LIGHTGREEN_EX + game.title + Style.RESET_ALL + " is already in your favourites.")
     else:
         favourite = Favourite(user_id=logged_user.id, game_id=game.id)
         session.add(favourite)
         session.commit()
-        print(f"You have successfully saved the game '{game.title}' to your favourite list!")
+        print("You have successfully saved the game " + Fore.LIGHTGREEN_EX + game.title + Style.RESET_ALL + " to your favourite list!")
+
+def print_heading(heading):
+    print("-"*50)
+    print(heading)
+    print("-"*50)
 
 def view_game_details(game):
     clear()
-    print(f"{game.title.upper()}")
-    print(f"GENRE: {game.genre}")
-    print(f"DESCRIPTION: {game.description}")
+    print_heading(Back.LIGHTGREEN_EX + game.title.upper() + Style.RESET_ALL)
 
-    print("Other Details")
-    print(f"Rating: {game.rating}")
-    print(f"Platform: {game.platform}")
-    print(f"Trailer: {game.trailer}")
+    print("\nGenre: " + Fore.LIGHTGREEN_EX + game.genre + Style.RESET_ALL)
+    print("\nRating: " + Fore.LIGHTGREEN_EX + str(game.rating) + Style.RESET_ALL + "\n")
+          
+    print_heading("Description")
+    print(Fore.LIGHTGREEN_EX + game.description + Style.RESET_ALL + "\n")
+
+    print_heading("Other details")
+    print("Platform: " + Fore.LIGHTGREEN_EX + game.platform + Style.RESET_ALL)
+    print("\nTrailer URL: " + Fore.LIGHTGREEN_EX + game.trailer + Style.RESET_ALL)
 
     #Ask to see if user wants to save game to favourites
-    print("Would you like add this game to your favourite list? (yes/no)")
-    save_input = input().lower()
+    print("\nWould you like add this game to your favourite list? (yes/no)")
+    save_input = input(Fore.LIGHTGREEN_EX).lower()
+    print(Style.RESET_ALL, end="")
     if save_input == "yes":
         clear()
         save_to_favourites(game)
@@ -92,7 +101,7 @@ def view_game_details(game):
         clear()
         return
     else:
-        print("Please enter a valid input: 'yes/no")
+        print(Fore.LIGHTRED_EX + "\nPlease enter a valid input: 'yes/no'" + Style.RESET_ALL)
 
 
 def view_by_genre():
@@ -100,9 +109,11 @@ def view_by_genre():
 
     print("\nGenres: \n") #Display the genre in a numbered list
     for idx, genre in enumerate(genres, 1):
-        print(f"{idx}) \t{genre}")
+        print(Fore.LIGHTGREEN_EX + str(idx) + ")" +  "\t" + Style.RESET_ALL + genre)
     
-    genre_choice = input("\nEnter the genre number you want to view(or type 'back' to return): \n")
+    print("\nEnter the genre number you want to view(or type 'back' to return): \n")
+    genre_choice = input(Fore.LIGHTGREEN_EX)
+    print(Style.RESET_ALL, end="")
     if genre_choice.lower() == "back":
         clear()
         return
@@ -126,6 +137,7 @@ def view_by_genre():
 
                 print("\nPlease enter the game ID to view more details (type 'back' to return): ")
                 id_input = input(Fore.LIGHTGREEN_EX)
+                print(Style.RESET_ALL, end="")
                 if id_input == "back":
                     clear()
                     return
@@ -138,27 +150,28 @@ def view_by_genre():
                         if game:
                             view_game_details(game)
                         else:
-                            print("No game found with that ID in the selected genre.")
+                            print(Fore.LIGHTRED_EX + "\nNo game found with that ID in the selected genre." + Style.RESET_ALL)
                     except ValueError:
-                        print("Invalid input.Please enter valid game ID or 'back' to return to previous selection")
+                        print(Fore.LIGHTRED_EX + "\nInvalid input.Please enter valid game ID or 'back' to return to previous selection" + Style.RESET_ALL)
             
             else:
-                print("No games found in this genre.")
+                print(Fore.LIGHTRED_EX + "\nNo games found in this genre." + Style.RESET_ALL)
         else:
-            print("Invalid genre selection.")
+            print(Fore.LIGHTRED_EX + "Invalid genre selection." + Style.RESET_ALL)
+            return
     except ValueError:
-        print("Invalid input. Please enter a valid genre number or 'back' to return.")
+        print(Fore.LIGHTRED_EX + "Invalid input. Please enter a valid genre number or 'back' to return." + Style.RESET_ALL)
 
                     
 
 def view_all_games():
     while True:
         print("\nHow would you like to view the games?\n")
-        print("1) \tView games in general")
-        print("2) \tView games by genre")
-        print("3) \tReturn to main menu\n")
+        print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tView games in general")
+        print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView games by genre")
+        print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tReturn to main menu")
 
-        print("Enter your choice: ", end="")
+        print("\nEnter your choice: ", end="")
         choice = input(Fore.LIGHTGREEN_EX + Style.BRIGHT).lower()
         print(Style.RESET_ALL, end="")
 
@@ -191,10 +204,11 @@ def view_all_games():
                     if game:
                         view_game_details(game)
                     else:
-                        print("No game found! Try again.")
+                        print(Fore.LIGHTRED_EX + "\nNo game found! Try again." + Style.RESET_ALL)
+                        return
                 
                 except ValueError:
-                    print("Invalid input. Please enter a valid game ID or 'back' to return to previous selection.")
+                    print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid game ID or 'back' to return to previous selection." + Style.RESET_ALL)
 
         elif choice == "2":
             clear()
@@ -203,7 +217,7 @@ def view_all_games():
             clear()
             break
         else:
-            print("Invalid choice. Please enter 1, 2, or 3.")
+            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2, or 3." + Style.RESET_ALL)
 
            
 def add_note_to_favourite(game_id):
@@ -248,14 +262,14 @@ def view_notes():
                 delete_note_from_favourite(game_id)
                 print(f"Successfully deleted note from '{fav.game.title}'!")
             except ValueError:
-                print("Invalid input. Please enter a valid Game ID.")
+                print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid Game ID." + Style.RESET_ALL)
         
         elif choice == "2":
             clear()
             break
         
         else:
-            print("Invalid choice. Please enter 1 or 2.")
+            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1 or 2." + Style.RESET_ALL)
 
 
 def view_favourites():
@@ -309,7 +323,7 @@ def view_favourites():
                 else:
                     print("No game found with that ID")
             except ValueError:
-                print("Invalid input. Please enter a valid game ID.")
+                print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid game ID." + Style.RESET_ALL)
 
         elif choice == "2":
             clear()
@@ -322,7 +336,7 @@ def view_favourites():
             clear()
             break
         else:
-            print("Invalid choice. Please enter 1, 2 or 3.")
+            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2 or 3." +Style.RESET_ALL)
 
 
 
@@ -345,9 +359,9 @@ def start():
             print(f"Thank you for using Crux Games App, see you again soon {Fore.GREEN}{logged_user.name}{Style.RESET_ALL}!")
             break
         else:
-            print("Please enter a valid selection")
+            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2, or 3." + Style.RESET_ALL)
             choice = main_menu()
-
+            
 
 #############################################################
 
