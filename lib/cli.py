@@ -46,9 +46,9 @@ def greet(): #Greet
 
 
 def main_menu():
-    print(f"-"*30)
+    print(f"-"*65)
     print(Fore.LIGHTBLUE_EX + "Crux Games Lookup By Emily Chew | e: codewithemilychew@gmail.com" + Style.RESET_ALL)
-    print(f"-"*30)
+    print(f"-"*65)
 
     print(Fore.LIGHTGREEN_EX + "\n1) " + Style.RESET_ALL + "\tView all games")
     print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView your saved favourites")
@@ -183,7 +183,12 @@ def view_all_games():
                 for game in games:
                     table.append([game.id, game.title, game.genre, game.rating])
                 
-                headers = [Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, Fore.LIGHTRED_EX + "Rating" + Fore.RESET]
+                headers = [
+                    Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, 
+                    Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, 
+                    Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, 
+                    Fore.LIGHTRED_EX + "Rating" + Fore.RESET
+                    ]
                 print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
             else:
                 print("No games...")
@@ -276,24 +281,35 @@ def view_favourites():
     while True:
         favourites = session.query(Favourite).filter_by(user_id=logged_user.id).all()
         if len(favourites)>0:
+            table = []
             for fav in favourites:
                 game = fav.game
                 note = fav.note if fav.note else "No notes added."
-                print(f"{game.id}) {game.title} - {game.genre}")
+                table.append([game.id, game.title, game.genre, game.rating])
+                
+            headers = [
+                Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, 
+                Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, 
+                Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, 
+                Fore.LIGHTRED_EX + "Rating" + Fore.RESET
+                ]
+            print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
         else:
-            print("You have no favourite games yet.")
+            print("\nYou have no favourite games yet. Please add some to your favourite list.")
 
-        print("\nPlease choose from the following options:")
-        print("1) View details of a favourite game")
-        print("2) View all games in general")
-        print("3) View all notes")
-        print("4) Return to main menu")
+        print("\nPlease choose from the following options:\n")
+        print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tView details of a favourite game")
+        print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView all games in general")
+        print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tView all notes")
+        print(Fore.LIGHTGREEN_EX + "4) " + Style.RESET_ALL + "\tReturn to main menu")
 
-        choice = input().lower()
-
+        choice = input(Fore.LIGHTGREEN_EX).lower()
+        print(Style.RESET_ALL, end="")
         if choice == "1":
             try:
-                game_id = int(input("Enter Game ID:"))
+                print("Enter Game ID: ")
+                game_id = int(input(Fore.LIGHTGREEN_EX))
+                print(Style.RESET_ALL, end="")
                 favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
                 if favourite:
                     game = favourite.game
