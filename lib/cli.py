@@ -1,6 +1,7 @@
 from config import session
 from models import User, Game, Favourite
 from colorama import Back, Fore, Style
+from datetime import datetime
 import pyfiglet 
 from tabulate import tabulate
 import os
@@ -71,6 +72,17 @@ def save_to_favourites(game): #Save game to favourites, but also checks it is al
         session.commit()
         print("You have successfully saved the game " + Fore.LIGHTGREEN_EX + game.title + Style.RESET_ALL + " to your favourite list!")
 
+def delete_from_favourites(game_id):
+    favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
+    if favourite:
+        clear()
+        session.delete(favourite)
+        session.commit()
+        print(Fore.LIGHTGREEN_EX + favourite.game.title + Style.RESET_ALL + " was removed from favourites.\n")
+    else:
+        print(Fore.LIGHTRED_EX + "No favourite game found with that ID." + Style.RESET_ALL)
+
+
 def print_heading(heading):
     print("-"*50)
     print(heading)
@@ -78,7 +90,11 @@ def print_heading(heading):
 
 def view_game_details(game, from_favourites=False):
     clear()
-    print_heading(Back.LIGHTGREEN_EX + game.title.upper() + Style.RESET_ALL)
+    
+    # Bold the game title
+    title = game.title.upper()
+    centered_title = '\033[1m' + title + '\033[0m'
+    print_heading(Back.LIGHTGREEN_EX + centered_title + Style.RESET_ALL)
 
     print("\nGenre: " + Fore.LIGHTGREEN_EX + game.genre + Style.RESET_ALL)
     print("\nRating: " + Fore.LIGHTGREEN_EX + str(game.rating) + Style.RESET_ALL + "\n")
@@ -89,6 +105,9 @@ def view_game_details(game, from_favourites=False):
     print_heading("Other details")
     print("Platform: " + Fore.LIGHTGREEN_EX + game.platform + Style.RESET_ALL)
     print("\nTrailer URL: " + Fore.LIGHTGREEN_EX + game.trailer + Style.RESET_ALL)
+    #Shows the number of people who has this game in their favourite list 
+    favourite_count = session.query(Favourite).filter_by(game_id=game.id).count()
+    print("\nNumber of users who have favourited this game: " + Fore.LIGHTMAGENTA_EX + str(favourite_count) + Style.RESET_ALL)
 
     if not from_favourites:
         #Ask to see if user wants to save game to favourites
@@ -106,10 +125,13 @@ def view_game_details(game, from_favourites=False):
     else:
         print_heading("MY OWN NOTES")
         favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game.id).first()
-        print(f"{favourite.note if favourite.note else 'No notes added yet.'}")
+        if favourite and favourite.note:
+            print(Fore.LIGHTGREEN_EX + favourite.note + Style.RESET_ALL)
+        else:
+            print(Fore.LIGHTRED_EX + "No notes added yet." + Style.RESET_ALL)
                     
         # Ask user if they want to add a note to this game 
-        subchoice = input("Do you want to add a note to this game? (yes/no): ").lower()
+        subchoice = input("\nDo you want to add a note to this game? (yes/no): ").lower()
         if subchoice == "yes":
             clear()
             add_note_to_favourite(game.id)
@@ -234,7 +256,7 @@ def view_all_games():
             view_by_genre()
         elif choice == "3":
             clear()
-            break
+            return
         else:
             print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2, or 3." + Style.RESET_ALL)
 
@@ -242,10 +264,12 @@ def view_all_games():
 def add_note_to_favourite(game_id):
         favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
         if favourite:
-            note = input("Enter your note: ")
+            print("Enter your note: ")
+            note = input(Fore.LIGHTGREEN_EX)
+            print(Style.RESET_ALL, end="")
             favourite.note = note
             session.commit()
-            print(f"Your note is successfully added to '{favourite.game.title}'!")
+            print("\nYour note is successfully added to " + Fore.LIGHTGREEN_EX + favourite.game.title + Style.RESET_ALL + "!")
         else:
             print("Favourite game not found")
 
@@ -263,29 +287,43 @@ def view_notes():
         favourites_with_notes = session.query(Favourite).filter(Favourite.user_id == logged_user.id, Favourite.note.isnot(None)).all()
         if favourites_with_notes:
             print("Your Notes:")
+            table = []
             for fav in favourites_with_notes:
-                print(f"Game ID: {fav.game_id} | Game Title: {fav.game.title} | Note: {fav.note}")
+                table.append([fav.game.id, fav.game.title, fav.game.genre, fav.note])
+                
+            headers = [
+                Fore.LIGHTGREEN_EX + "Game ID" + Fore.RESET, 
+                Fore.LIGHTBLUE_EX + "Title" + Fore.RESET, 
+                Fore.LIGHTMAGENTA_EX + "Genre" + Fore.RESET, 
+                Fore.LIGHTRED_EX + "Note" + Fore.RESET
+                ]
+            print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
         else:
             print("You have no notes for any of your favourite games.")
         
         print("\nPlease choose from the following options:")
-        print("1) Delete a note")
-        print("2) Return to main menu")
+        print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tDelete a note")
+        print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tReturn to previous page")
 
-        choice = input().lower()
+        choice = input(Fore.LIGHTGREEN_EX).lower()
+        print(Style.RESET_ALL, end="")
 
         if choice == "1":
             try:
-                clear()
-                game_id = int(input("Enter Game ID of the note to delete: "))
-                delete_note_from_favourite(game_id)
-                print(f"Successfully deleted note from '{fav.game.title}'!")
+                print("Enter Game ID of the note to delete: ")
+                game_id = int(input(Fore.LIGHTGREEN_EX))
+                print(Style.RESET_ALL, end="")
+                favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game_id).first()
+                if favourite:
+                    clear()
+                    delete_note_from_favourite(game_id)
+                    print("Successfully deleted note from " + Fore.LIGHTGREEN_EX + fav.game.title + Style.RESET_ALL + "!")
             except ValueError:
                 print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid Game ID." + Style.RESET_ALL)
         
         elif choice == "2":
             clear()
-            break
+            return
         
         else:
             print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1 or 2." + Style.RESET_ALL)
@@ -313,9 +351,10 @@ def view_favourites():
 
         print("\nPlease choose from the following options:\n")
         print(Fore.LIGHTGREEN_EX + "1) " + Style.RESET_ALL + "\tView details of a favourite game")
-        print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tView all games in general")
-        print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tView all notes")
-        print(Fore.LIGHTGREEN_EX + "4) " + Style.RESET_ALL + "\tReturn to main menu")
+        print(Fore.LIGHTGREEN_EX + "2) " + Style.RESET_ALL + "\tDelete a game from favourite list")
+        print(Fore.LIGHTGREEN_EX + "3) " + Style.RESET_ALL + "\tGames Lookup")
+        print(Fore.LIGHTGREEN_EX + "4) " + Style.RESET_ALL + "\tView all notes")
+        print(Fore.LIGHTGREEN_EX + "5) " + Style.RESET_ALL + "\tReturn to main menu")
 
         choice = input(Fore.LIGHTGREEN_EX).lower()
         print(Style.RESET_ALL, end="")
@@ -335,17 +374,27 @@ def view_favourites():
                 print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid game ID." + Style.RESET_ALL)
 
         elif choice == "2":
-            clear()
-            view_all_games()
+            try: 
+                print("Enter Game ID to delete from favourites: ")
+                game_id = int(input(Fore.LIGHTGREEN_EX))
+                print(Style.RESET_ALL, end="")
+                delete_from_favourites(game_id)
+            except ValueError:
+                print(Fore.LIGHTRED_EX + "\nInvalid input. Please enter a valid game ID." + Style.RESET_ALL)
+
 
         elif choice == "3":
             clear()
-            view_notes()
+            view_all_games()
+
         elif choice == "4":
+            clear()
+            view_notes()
+        elif choice == "5":
             clear()
             break
         else:
-            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2 or 3." +Style.RESET_ALL)
+            print(Fore.LIGHTRED_EX + "\nInvalid choice. Please enter 1, 2, 3, 4 or 5." + Style.RESET_ALL)
 
 
 
@@ -359,7 +408,6 @@ def start():
         if choice == "1":
             clear()
             view_all_games()
-            # print("Do you want to view games in general or by genre?")
         elif choice == "2":
             clear()
             view_favourites()
