@@ -76,7 +76,7 @@ def print_heading(heading):
     print(heading)
     print("-"*50)
 
-def view_game_details(game):
+def view_game_details(game, from_favourites=False):
     clear()
     print_heading(Back.LIGHTGREEN_EX + game.title.upper() + Style.RESET_ALL)
 
@@ -90,18 +90,32 @@ def view_game_details(game):
     print("Platform: " + Fore.LIGHTGREEN_EX + game.platform + Style.RESET_ALL)
     print("\nTrailer URL: " + Fore.LIGHTGREEN_EX + game.trailer + Style.RESET_ALL)
 
-    #Ask to see if user wants to save game to favourites
-    print("\nWould you like add this game to your favourite list? (yes/no)")
-    save_input = input(Fore.LIGHTGREEN_EX).lower()
-    print(Style.RESET_ALL, end="")
-    if save_input == "yes":
-        clear()
-        save_to_favourites(game)
-    elif save_input == "no":
-        clear()
-        return
+    if not from_favourites:
+        #Ask to see if user wants to save game to favourites
+        print("\nWould you like add this game to your favourite list? (yes/no)")
+        save_input = input(Fore.LIGHTGREEN_EX).lower()
+        print(Style.RESET_ALL, end="")
+        if save_input == "yes":
+            clear()
+            save_to_favourites(game)
+        elif save_input == "no":
+            clear()
+            return
+        else:
+            print(Fore.LIGHTRED_EX + "\nPlease enter a valid input: 'yes/no'" + Style.RESET_ALL)
     else:
-        print(Fore.LIGHTRED_EX + "\nPlease enter a valid input: 'yes/no'" + Style.RESET_ALL)
+        print_heading("MY OWN NOTES")
+        favourite = session.query(Favourite).filter_by(user_id=logged_user.id, game_id=game.id).first()
+        print(f"{favourite.note if favourite.note else 'No notes added yet.'}")
+                    
+        # Ask user if they want to add a note to this game 
+        subchoice = input("Do you want to add a note to this game? (yes/no): ").lower()
+        if subchoice == "yes":
+            clear()
+            add_note_to_favourite(game.id)
+        elif subchoice == "no":
+            clear()
+            return
 
 
 def view_by_genre():
@@ -314,28 +328,7 @@ def view_favourites():
                 if favourite:
                     game = favourite.game
                     clear()
-                    print(f"{game.title.upper()}")
-                    print(f"GENRE: {game.genre}")
-                    print(f"DESCRIPTION: {game.description}")
-
-                    print("Other Details")
-                    print(f"Rating: {game.rating}")
-                    print(f"Platform: {game.platform}")
-                    print(f"Trailer: {game.trailer}")
-
-                    print("-"*30)
-                    print("MY OWN NOTES")
-                    print("-"*30)
-                    print(f"{favourite.note if favourite.note else 'No notes added yet.'}")
-                    
-                    #Ask user if they want to add a note to this game 
-                    subchoice = input("Do you want to add a note to this game? (yes/no): ").lower()
-                    if subchoice == "yes":
-                        clear()
-                        add_note_to_favourite(game_id)
-                    elif subchoice == "no":
-                        continue
-
+                    view_game_details(game, from_favourites=True)
                 else:
                     print("No game found with that ID")
             except ValueError:
